@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const patientSchema = new mongoose.Schema(
+const patientSchema = new Schema(
     {
         name: { type: String, required: true },
 
         email: { type: String, required: true, lowercase: true },
 
-        date_of_birth: { type: Date, required: true },
+        date_of_birth: { type: String, required: true },
 
         gender: { type: String, enum: ["male", "female"], required: true },
 
@@ -24,7 +25,6 @@ const patientSchema = new mongoose.Schema(
         package: {
             type: Schema.Types.ObjectId,
             ref: "Package",
-            default: "none",
         },
 
         wallet_amount: { type: Number, default: 0 },

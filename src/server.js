@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const registrationRouter = require("./routes/registrationRoutes");
 
 require("dotenv").config();
 
@@ -24,6 +25,9 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.status(200).send("Welcome!");
 });
+
+app.use("/register", registrationRouter);
+app.post("/login");
 
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}...`);

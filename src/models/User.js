@@ -14,10 +14,10 @@ const userSchema = new Schema(
         password: {
             type: String,
             required: true,
-            match: [
-                /^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
-                "password must contain at least 8 characters, a number, lowercase and uppercase letters, and a special character",
-            ],
+            // match: [
+            //     /^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
+            //     "password must contain at least 8 characters, a number, lowercase and uppercase letters, and a special character",
+            // ],
         },
 
         doctor: { type: Schema.Types.ObjectId, ref: "Doctor" },

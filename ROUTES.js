@@ -5,18 +5,20 @@ router.get("/", (req, res) => {
     res.redirect("/login");
 });
 
-// REGISTRATION
+// REGISTRATION and LOGIN
 router.all("/register");
 
-router.post("/register/newPatient");
-router.post("/register/newDoctor");
+router.post("/register/newPatient", loginController.registerNewPatient);
+router.post("/register/newDoctor", loginController.registerNewDoctor);
+router.post("/login", loginController.loginUser);
 
 // ADMIN
 router.all("/admin");
 
 router.post("/admin/newAdmin");
-router.delete("/admin/removeUser/:userID");
+router.delete("/admin/removeUser/:userID"); // * by name?
 // can be the id of any user, the handler function will figure out which type of user and will remove him from db
+router.get("admin/doctorRequests");
 
 router.post("/admin/newPackage");
 router.delete("/admin/removePackage/:id");
@@ -38,6 +40,17 @@ router.get("/patient/:id/familyMembers");
 
 // OTHER
 
-// 23 - filter appointments by date/status
-// localhost:5000/appointments?start_time=000&end_time=000&status=upcoming
-router.get("/");
+// 23 - patient/doc: filter appointments by date/status
+
+// 34 - doctor: search for patient by name
+//   ay patient fel system walla el patients beta3t el doctor?
+
+// 35 - doctor: filter patients based on upcoming appointments
+
+//
+
+//
+/* // PHARMACY // */
+//
+
+//
