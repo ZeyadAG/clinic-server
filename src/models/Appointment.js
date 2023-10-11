@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const appointmentSchema = new mongoose.Schema(
+const appointmentSchema = new Schema(
     {
         doctor: {
             type: Schema.Types.ObjectId,

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const doctorSchema = new mongoose.Schema(
+const doctorSchema = new Schema(
     {
         registration_request_status: {
             type: String,
@@ -40,7 +41,7 @@ const doctorSchema = new mongoose.Schema(
 
         appointments: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
 
-        patients: [{ type: Schema.Types.ObjectId, ref: Patient }],
+        patients: [{ type: Schema.Types.ObjectId, ref: "Patient" }],
     },
     { timestamps: true }
 );

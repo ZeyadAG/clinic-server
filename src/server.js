@@ -1,8 +1,13 @@
+//* IMPORTS *//
 const express = require("express");
 const mongoose = require("mongoose");
+
 const registrationRouter = require("./routes/registrationRoutes");
 const adminRouter = require("./routes/adminRoutes");
+const patientRouter = require("./routes/patientRoutes");
+const doctorRouter = require("./routes/doctorRoutes");
 
+//* SETUP *//
 require("dotenv").config();
 
 const MONGO_URI = process.env.MONGO_URI;
@@ -19,19 +24,22 @@ db.once("open", () => {
     console.log("Connected to database succefully");
 });
 
+//* APP *//
 const app = express();
 
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}...`);
+});
+
+// MIDDLEWARE
 app.use(express.json());
 
+// ROUTES
 app.get("/", (req, res) => {
     res.status(200).send("Welcome!");
 });
 
 app.use("/register", registrationRouter);
 app.use("/admin", adminRouter);
-
-app.post("/login");
-
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}...`);
-});
+app.use("/doctor", doctorRouter);
+app.use("/patient", patientRouter);

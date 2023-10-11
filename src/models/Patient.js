@@ -7,7 +7,7 @@ const patientSchema = new Schema(
 
         email: { type: String, required: true, lowercase: true },
 
-        date_of_birth: { type: String, required: true },
+        date_of_birth: { type: Date, required: true },
 
         gender: { type: String, enum: ["male", "female"], required: true },
 
@@ -25,6 +25,7 @@ const patientSchema = new Schema(
         package: {
             type: Schema.Types.ObjectId,
             ref: "Package",
+            // default: Schema.Types.ObjectId("") // refers to the "none" package
         },
 
         wallet_amount: { type: Number, default: 0 },

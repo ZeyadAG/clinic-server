@@ -1,8 +1,6 @@
 const User = require("../models/User");
 const Patient = require("../models/Patient");
-// const Doctor = require("../models/Doctor");
-
-const mongoose = require("mongoose");
+const Doctor = require("../models/Doctor");
 
 const registerNewPatient = async (req, res) => {
     try {
@@ -32,12 +30,13 @@ const registerNewPatient = async (req, res) => {
             patient: patient._id,
         });
 
+        // await Promise.all([user.save(), patient.save()]);
         await user.save();
         await patient.save();
 
-        res.status(200).json(user);
+        return res.status(201).json(user);
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        return res.status(400).json({ error: err.message });
     }
 };
 
