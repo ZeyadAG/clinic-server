@@ -13,7 +13,7 @@ router.post("/register/newDoctor", loginController.registerNewDoctor);
 router.post("/login", loginController.loginUser);
 
 // ADMIN
-router.all("/admin");
+router.all("/admin"); // requests, doctors, patients
 
 router.post("/admin/newAdmin");
 

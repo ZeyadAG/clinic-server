@@ -9,9 +9,9 @@ const packageSchema = new Schema(
 
         doctor_sessions_discount: { type: Number, required: true },
 
-        medicin_discount: { type: Number, required: true },
+        medicine_discount: { type: Number, required: true },
 
-        subscription_discount: { type: Number, required: true },
+        subscriptions_discount: { type: Number, required: true },
     },
     { timestamps: true }
 );

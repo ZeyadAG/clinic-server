@@ -1,11 +1,13 @@
 //* IMPORTS *//
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const registrationRouter = require("./routes/registrationRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const patientRouter = require("./routes/patientRoutes");
 const doctorRouter = require("./routes/doctorRoutes");
+const Patient = require("./models/Patient");
 
 //* SETUP *//
 require("dotenv").config();
@@ -27,12 +29,9 @@ db.once("open", () => {
 //* APP *//
 const app = express();
 
-app.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}...`);
-});
-
 // MIDDLEWARE
 app.use(express.json());
+app.use(cors());
 
 // ROUTES
 app.get("/", (req, res) => {
@@ -43,3 +42,14 @@ app.use("/register", registrationRouter);
 app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
+
+app.post("/newPatient", async (req, res) => {
+    req.body.username;
+    const patient = new Patient();
+    await patient.save();
+    res.status(200).send("saved success");
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server listening on port ${PORT}...`);
+});
