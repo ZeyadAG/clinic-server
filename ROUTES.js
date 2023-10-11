@@ -16,12 +16,17 @@ router.post("/login", loginController.loginUser);
 router.all("/admin");
 
 router.post("/admin/newAdmin");
+
+//tbd
 router.delete("/admin/removeUser/:userID"); // * by name?
 // can be the id of any user, the handler function will figure out which type of user and will remove him from db
 router.get("admin/doctorRequests");
 
 router.post("/admin/newPackage");
+
+//tbd
 router.delete("/admin/removePackage/:id");
+//tbd
 router.put("/admin/updatePackage/:id");
 
 // DOCTOR
