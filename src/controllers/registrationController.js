@@ -40,6 +40,40 @@ const registerNewPatient = async (req, res) => {
     }
 };
 
-const registerNewDoctor = async (req, res) => {};
+const registerNewDoctor = async (req, res) => {
+    try {
+        const {
+            username,
+            password,
+            name,
+            email,
+            date_of_birth,
+            hourly_rate,
+            affiliated_hospital,
+            educational_background,
+        } = req.body;
+
+        const doctor = new Doctor({
+            name,
+            email,
+            date_of_birth,
+            hourly_rate,
+            affiliated_hospital,
+            educational_background,
+        });
+        const user = new User({
+            username,
+            password,
+            doctor: doctor._id,
+        });
+
+        await user.save();
+        await doctor.save();
+
+        return res.status(201).json(doctor);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+};
 
 module.exports = { registerNewPatient, registerNewDoctor };
