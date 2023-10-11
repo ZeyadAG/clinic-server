@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const registrationRouter = require("./routes/registrationRoutes");
+const adminRouter = require("./routes/adminRoutes");
 
 require("dotenv").config();
 
@@ -27,6 +28,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/register", registrationRouter);
+app.use("/admin", adminRouter);
+
 app.post("/login");
 
 app.listen(PORT, () => {
