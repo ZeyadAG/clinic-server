@@ -33,4 +33,22 @@ const getFamilyMembers = async (req, res) => {
     }
 };
 
-module.exports = { addFamilyMember, getFamilyMembers };
+const addNewAppointment = async (req, res) => {};
+
+const getPatientAppointments = async (req, res) => {};
+
+const getPatientDoctors = async (req, res) => {};
+
+const addNewPrescription = async (req, res) => {};
+
+const getPatientPrescriptions = async (req, res) => {};
+
+module.exports = {
+    addFamilyMember,
+    getFamilyMembers,
+    addNewAppointment,
+    getPatientAppointments,
+    getPatientDoctors,
+    addNewPrescription,
+    getPatientPrescriptions,
+};

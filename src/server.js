@@ -50,6 +50,6 @@ app.post("/newPatient", async (req, res) => {
     res.status(200).send("saved success");
 });
 
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}...`);
 });
