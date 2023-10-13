@@ -86,7 +86,17 @@ const acceptDoctor = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const userID = req.params.userID;
+        const user = await User.findById(userID);
+
+        if (user.doctor) {
+            await Doctor.deleteOne({ _id: user.doctor });
+        }
+        if (user.patient) {
+            await Patient.deleteOne({ _id: user.patient });
+        }
+
         await User.findByIdAndDelete(userID);
+
         return res.status(200).json({ message: "user deleted successfully" });
     } catch (e) {
         res.status(400).json({ error: e.message });

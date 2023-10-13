@@ -30,12 +30,16 @@ const updateDoctorInfo = async (req, res) => {
 const getDoctorPatients = async (req, res) => {
     try {
         const doctorID = req.params.id;
-        const doctor = await Doctor.findById(doctor_id);
+        const doctor = await Doctor.findById(doctorID).populate({
+            path: "appointments",
+            populate: { path: "patient" },
+        });
 
-        const patients = doctor.patients;
+        const patients = doctor.appointments.map((a) => a.patient);
+
         return res.status(200).json(patients);
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        return res.status(400).json({ error: err.message });
     }
 };
 
@@ -44,11 +48,14 @@ const getPatientByName = async (req, res) => {
         const doctorID = req.params.id;
         const patientName = req.params.patientName;
 
-        const doctor = await Doctor.findById(doctor_id);
+        const doctor = await Doctor.findById(doctorID).populate({
+            path: "appointments",
+            populate: { path: "patient" },
+        });
 
-        const patient = doctor.patients.filter(
-            (patient) => patient.name === patientName
-        );
+        const patient = doctor.appointments
+            .map((a) => a.patient)
+            .filter((patient) => patient.name === patientName);
 
         return res.status(200).json(patient);
     } catch (err) {
@@ -59,12 +66,21 @@ const getPatientByName = async (req, res) => {
 const getDoctorAppointments = async (req, res) => {
     try {
         const doctorID = req.params.id;
-        const doctor = await Doctor.findById(doctor_id);
+        const doctor = await Doctor.findById(doctorID)
+            .populate({
+                path: "appointments",
+                populate: { path: "patient" },
+            })
+            .populate({
+                path: "appointments",
+                populate: { path: "doctor" },
+            });
 
         const appointments = doctor.appointments;
+
         return res.status(200).json(appointments);
     } catch (err) {
-        return res.status(500).json({ error: err.message });
+        return res.status(400).json({ error: err.message });
     }
 };
 

@@ -11,15 +11,17 @@ const doctorSchema = new Schema(
 
         name: { type: String, required: true },
 
+        speciality: { type: String },
+
         email: { type: String, required: true, lowercase: true },
 
         date_of_birth: { type: Date, required: true },
 
-        hourly_rate: { type: Number, required: true },
-
         affiliated_hospital: { type: String, required: true },
 
         educational_background: { type: String, required: true },
+
+        hourly_rate: { type: Number, required: true },
 
         appointment_slots: [
             {
@@ -40,8 +42,6 @@ const doctorSchema = new Schema(
         ],
 
         appointments: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
-
-        patients: [{ type: Schema.Types.ObjectId, ref: "Patient" }],
     },
     { timestamps: true }
 );

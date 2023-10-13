@@ -39,6 +39,7 @@ const patientSchema = new Schema(
                     type: Schema.Types.ObjectId,
                     ref: "Appointment",
                 },
+                time_of_prescription: { type: Date },
                 status: {
                     type: String,
                     enum: ["filled", "unfilled"],
