@@ -43,13 +43,6 @@ app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
 
-app.post("/newPatient", async (req, res) => {
-    req.body.username;
-    const patient = new Patient();
-    await patient.save();
-    res.status(200).send("saved success");
-});
-
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}...`);
 });
