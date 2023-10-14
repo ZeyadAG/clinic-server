@@ -44,25 +44,6 @@ const getDataForAdmin = async (req, res) => {
             (user) => user.doctor.registration_request_status === "pending"
         );
 
-        // results.accepted_doctors = (
-        //     await User.find({ doctor: $exist }).populate("doctor")
-        // ).filter(
-        //     (user) => user.doctor.registration_request_status === "accepted"
-        // );
-        // results.pending_doctors = (
-        //     await User.find({ doctor: $exist }).populate("doctor")
-        // ).filter(
-        //     (user) => user.doctor.registration_request_status === "pending"
-        // );
-
-        // results.all_patients = await Patient.find();
-        // results.accepted_doctors = await User.find().populateDoctor.find({
-        //     registration_request_status: "accepted",
-        // });
-        // results.pending_doctors = await Doctor.find({
-        //     registration_request_status: "pending",
-        // });
-
         return res.status(200).json(results);
     } catch (err) {
         return res.status(400).json({ error: err.message });

@@ -40,23 +40,21 @@ const getFamilyMembers = async (req, res) => {
 const addNewAppointment = async (req, res) => {
     try {
         const appointment = new Appointment({
-            doctor: new Types.ObjectId("6526a07ae28d3bb9af22f111"),
+            doctor: new Types.ObjectId("6526a20d84b1a00bbb764d86"),
             patient: new Types.ObjectId("6526a043e28d3bb9af22f103"),
             time_slot: {
-                start_time: new Date("2023-10-11T15:17:46.484+00:00"),
-                end_time: new Date("2023-10-11T16:17:46.484+00:00"),
+                start_time: new Date("2023-10-17T15:17:46.484+00:00"),
+                end_time: new Date("2023-10-17T16:17:46.484+00:00"),
             },
         });
 
-        const doctor = await Doctor.findById("6526a07ae28d3bb9af22f111");
+        const doctor = await Doctor.findById("6526a20d84b1a00bbb764d86");
         const patient = await Patient.findById("6526a043e28d3bb9af22f103");
 
         doctor.appointments.push(appointment._id);
         patient.appointments.push(appointment._id);
 
-        await appointment.save();
-        await patient.save();
-        await doctor.save();
+        await Promise.all([appointment.save(), patient.save(), doctor.save()]);
 
         return res.status(200).json(appointment);
     } catch (err) {
@@ -107,26 +105,26 @@ const addNewPrescription = async (req, res) => {
         const prescription = {
             medicines: [
                 {
-                    name: "congestal",
-                    dosage: "100mg",
+                    name: "milga",
+                    dosage: "300mg",
                 },
                 {
-                    name: "panadol",
-                    dosage: "500mg",
+                    name: "congestal",
+                    dosage: "1000mg",
                 },
             ],
             associated_appointment: new Types.ObjectId(
-                "6527ad529c398daf81c877eb"
+                "6529f7422ca92c0deda5bd52"
             ),
-            time_of_prescription: new Date("2023-10-11T18:17:46.484+00:00"),
-            status: "filled",
+            time_of_prescription: new Date("2023-10-15T18:17:46.484+00:00"),
+            status: "unfilled",
         };
 
         patient.prescriptions.push(prescription);
 
         await patient.save();
 
-        return res.status(200).json(patient);
+        return res.status(200).json(patient.prescriptions);
     } catch (err) {
         return res.status(400).json({ error: err.message });
     }
