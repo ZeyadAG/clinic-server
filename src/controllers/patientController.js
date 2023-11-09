@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Patient = require("../models/Patient");
 const Appointment = require("../models/Appointment");
 const Doctor = require("../models/Doctor");
+const Package = require("../models/Package");
 
 const { Types } = require("mongoose");
 
@@ -40,16 +41,16 @@ const getFamilyMembers = async (req, res) => {
 const addNewAppointment = async (req, res) => {
     try {
         const appointment = new Appointment({
-            doctor: new Types.ObjectId("6526a20d84b1a00bbb764d86"),
-            patient: new Types.ObjectId("6526a043e28d3bb9af22f103"),
+            doctor: new Types.ObjectId("652b3fec91562604ff4a2a38"),
+            patient: new Types.ObjectId("652b31c0b3892044a3fe4f6b"),
             time_slot: {
                 start_time: new Date("2023-10-17T15:17:46.484+00:00"),
                 end_time: new Date("2023-10-17T16:17:46.484+00:00"),
             },
         });
 
-        const doctor = await Doctor.findById("6526a20d84b1a00bbb764d86");
-        const patient = await Patient.findById("6526a043e28d3bb9af22f103");
+        const doctor = await Doctor.findById("652b3fec91562604ff4a2a38");
+        const patient = await Patient.findById("652b31c0b3892044a3fe4f6b");
 
         doctor.appointments.push(appointment._id);
         patient.appointments.push(appointment._id);
@@ -92,6 +93,51 @@ const getPatientDoctors = async (req, res) => {
         });
 
         const doctors = patient.appointments.map((a) => a.doctor);
+
+        return res.status(200).json(doctors);
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
+    }
+};
+
+const changePatientPackage = async (req, res) => {
+    try {
+        const patientID = req.params.id;
+        const packageName = req.body.package_name;
+
+        const patient = await Patient.findById(patientID);
+        const package = await Package.findOne({ name: packageName });
+
+        console.log(package, package._id);
+
+        patient.package = package._id;
+
+        await patient.save();
+        return res.status(200).json(patient.package);
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
+    }
+};
+
+const getDoctorsBasedOnPackage = async (req, res) => {
+    try {
+        const patientID = req.params.id;
+        const patient = await Patient.findById(patientID).populate("package");
+
+        const doctors = await Doctor.find({
+            registration_request_status: "accepted",
+        });
+
+        const discount = patient.package.doctor_sessions_discount;
+        const clinicMarkup = 0.1;
+
+        doctors.forEach((doc) => {
+            doc.hourly_rate = (
+                doc.hourly_rate +
+                doc.hourly_rate * clinicMarkup -
+                doc.hourly_rate * discount
+            ).toFixed(2);
+        });
 
         return res.status(200).json(doctors);
     } catch (err) {
@@ -159,4 +205,6 @@ module.exports = {
     getPatientDoctors,
     addNewPrescription,
     getPatientPrescriptions,
+    changePatientPackage,
+    getDoctorsBasedOnPackage,
 };

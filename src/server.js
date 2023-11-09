@@ -4,10 +4,10 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const registrationRouter = require("./routes/registrationRoutes");
+const loginRoute = require("./routes/loginRoute");
 const adminRouter = require("./routes/adminRoutes");
 const patientRouter = require("./routes/patientRoutes");
 const doctorRouter = require("./routes/doctorRoutes");
-const Patient = require("./models/Patient");
 
 //* SETUP *//
 require("dotenv").config();
@@ -42,7 +42,8 @@ app.use("/register", registrationRouter);
 app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
+app.use(loginRoute);
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on port ${PORT}...`);
 });

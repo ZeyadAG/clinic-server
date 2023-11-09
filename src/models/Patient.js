@@ -25,6 +25,7 @@ const patientSchema = new Schema(
         package: {
             type: Schema.Types.ObjectId,
             ref: "Package",
+            default: null,
             // default: Schema.Types.ObjectId("") // refers to the "none" package
         },
 

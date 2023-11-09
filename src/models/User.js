@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
+
+require("dotenv").config();
 
 //const validator = require('validator')
 const Schema = mongoose.Schema;
@@ -26,5 +29,13 @@ const userSchema = new Schema(
     },
     { timestamps: true }
 );
+
+userSchema.pre("save", async function (next) {
+    this.unhashed_password = this.password;
+    console.log("pass: " + this.unhashed_password, this.password);
+    this.password = await bcrypt.hash(this.password, 10);
+
+    next();
+});
 
 module.exports = mongoose.model("User", userSchema);
