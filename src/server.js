@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const registrationRouter = require("./routes/registrationRoutes");
-const loginRoute = require("./routes/loginRoute");
+const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const patientRouter = require("./routes/patientRoutes");
 const doctorRouter = require("./routes/doctorRoutes");
@@ -39,10 +39,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/register", registrationRouter);
+app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
-app.use(loginRoute);
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on port ${PORT}...`);

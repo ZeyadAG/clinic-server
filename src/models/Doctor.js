@@ -3,9 +3,14 @@ const Schema = mongoose.Schema;
 
 const doctorSchema = new Schema(
     {
-        registration_request_status: {
+        registration_status: {
             type: String,
-            enum: ["pending", "accepted", "rejected"],
+            enum: [
+                "pending",
+                "accepted_by_admin",
+                "rejected_by_admin",
+                "accepted",
+            ],
             default: "pending",
         },
 
@@ -23,7 +28,9 @@ const doctorSchema = new Schema(
 
         hourly_rate: { type: Number, required: true },
 
-        appointment_slots: [
+        wallet_amount: { type: Number, default: 0 },
+
+        appointments_time_slots: [
             {
                 start_time: {
                     type: Date,

@@ -1,27 +1,15 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 
-require("dotenv").config();
-
-//const validator = require('validator')
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema(
     {
-        username: {
-            type: String,
-            unique: true,
-            required: true,
-        },
+        username: { type: String, unique: true, required: true },
+        password: { type: String, required: true },
 
-        password: {
-            type: String,
-            required: true,
-            // match: [
-            //     /^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
-            //     "password must contain at least 8 characters, a number, lowercase and uppercase letters, and a special character",
-            // ],
-        },
+        name: { type: String, required: true },
+        email: { type: String, required: true, lowercase: true },
 
         doctor: { type: Schema.Types.ObjectId, ref: "Doctor" },
         patient: { type: Schema.Types.ObjectId, ref: "Patient" },
