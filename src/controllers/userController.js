@@ -77,4 +77,11 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { login };
+const changeUserPassword = async (req, res) => {
+    try {
+    } catch (err) {}
+};
+
+const generateOTP = async () => {};
+
+module.exports = { login, changeUserPassword, generateOTP };
