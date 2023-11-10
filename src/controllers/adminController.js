@@ -5,10 +5,12 @@ const Package = require("../models/Package");
 
 const addNewAdmin = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, password, name, email } = req.body;
         const admin = new User({
             username,
             password,
+            name, // +
+            email, // +
             admin: true,
         });
         await admin.save();

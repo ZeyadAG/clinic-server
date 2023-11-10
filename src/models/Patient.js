@@ -3,9 +3,11 @@ const Schema = mongoose.Schema;
 
 const patientSchema = new Schema(
     {
-        name: { type: String, required: true },
+        // name: { type: String, required: true },
 
-        email: { type: String, required: true, lowercase: true },
+        // email: { type: String, required: true, lowercase: true },
+
+        user: { type: Schema.Types.ObjectId, ref: "User" },
 
         date_of_birth: { type: Date, required: true },
 
@@ -26,7 +28,9 @@ const patientSchema = new Schema(
             expiry_date: Date,
             status: {
                 type: String,
-                enum: ["subscribed", "expired"],
+                enum: ["subscribed", "unsubscribed", "expired"],
+                required: true,
+                default: "unsubscribed",
             },
         },
 

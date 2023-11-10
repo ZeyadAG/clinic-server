@@ -3,6 +3,8 @@ const Schema = mongoose.Schema;
 
 const doctorSchema = new Schema(
     {
+        user: { type: Schema.Types.ObjectId, ref: "User" },
+
         registration_status: {
             type: String,
             enum: [
@@ -14,17 +16,17 @@ const doctorSchema = new Schema(
             default: "pending",
         },
 
-        name: { type: String, required: true },
+        // name: { type: String, required: true },
 
-        speciality: { type: String },
-
-        email: { type: String, required: true, lowercase: true },
+        // email: { type: String, required: true, lowercase: true },
 
         date_of_birth: { type: Date, required: true },
 
         affiliated_hospital: { type: String, required: true },
 
         educational_background: { type: String, required: true },
+
+        speciality: { type: String, required: true },
 
         hourly_rate: { type: Number, required: true },
 
