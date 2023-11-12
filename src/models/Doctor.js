@@ -7,18 +7,17 @@ const doctorSchema = new Schema(
 
         registration_status: {
             type: String,
-            enum: [
-                "pending",
-                "accepted_by_admin",
-                "rejected_by_admin",
-                "accepted",
-            ],
+            enum: ["pending", "accepted_by_admin", "accepted"],
             default: "pending",
         },
 
         // name: { type: String, required: true },
 
         // email: { type: String, required: true, lowercase: true },
+
+        national_id_document: String,
+        medical_degree_document: String,
+        medical_licenses: [String],
 
         date_of_birth: { type: Date, required: true },
 

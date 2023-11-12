@@ -11,9 +11,8 @@ router.delete("/removeUser/:userID", adminController.deleteUser);
 
 router.put("/acceptDoctor/:id", adminController.acceptDoctor);
 
-router.get("/packages", adminController.getAllPackages);
 router.post("/newPackage", adminController.addNewPackage);
-router.put("/updatePackage/:id", adminController.updatePackage);
-router.delete("/removePackage/:id", adminController.removePackage);
+router.put("/updatePackage/:packageID", adminController.updatePackage);
+router.delete("/removePackage/:packageID", adminController.removePackage);
 
 module.exports = router;

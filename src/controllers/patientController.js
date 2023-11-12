@@ -3,21 +3,72 @@ const Patient = require("../models/Patient");
 const Appointment = require("../models/Appointment");
 const Doctor = require("../models/Doctor");
 const Package = require("../models/Package");
+// const path = require('path')
 
 const { Types } = require("mongoose");
 
-const addFamilyMember = async (req, res) => {
+const addMedicalHistoryDocument = async (req, res) => {
     try {
-        const patientID = req.params.id;
-        const { name, national_id, age, gender, relation } = req.body;
+        const { id } = req.params;
 
-        const patient = await Patient.findById(patientID);
+        if (!req.files || Object.keys(req.files).length === 0) {
+            return res.status(400).send("No files were uploaded.");
+        }
 
-        const newMember = { name, national_id, age, gender, relation };
+        let uploadedFile = req.files.file;
+        const filePath = `./user-files/patients-files/${id.slice(-7)}-${
+            uploadedFile.name
+        }`;
 
-        patient.family.members.push(newMember);
+        await uploadedFile.mv(filePath, function (err) {
+            if (err) return res.status(500).send(err);
+
+            res.send("File uploaded!");
+        });
+
+        const patient = await Patient.findById(id);
+        patient.medical_history_documents.push(filePath);
 
         await patient.save();
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+const getMedicalHistoryDocuments = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const patient = await Patient.findById(id);
+        const medicalHistoryDocuments = patient.medical_history_documents;
+
+        return res.status(200).json(medicalHistoryDocuments);
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
+    }
+};
+
+const addFamilyMember = async (req, res) => {
+    try {
+        const { id, patientID } = req.params;
+        const { relation } = req.body;
+
+        const [patient, familyMember] = await Promise.all([
+            Patient.findById(id),
+            Patient.findById(patientID),
+        ]);
+
+        let otherRelation;
+        if (relation === "husband") otherRelation = "wife";
+        if (relation === "wife") otherRelation = "husband";
+        if (relation === "child") otherRelation = "parent";
+        if (relation === "parent") otherRelation = "child";
+        if (relation === "sibling") otherRelation = "sibling";
+
+        patient.family.push({ patient: patientID, relation: relation });
+        familyMember.family.push({ patient: id, relation: otherRelation });
+
+        await Promise.all([patient.save(), familyMember.save()]);
 
         return res.status(200).json(patient.family);
     } catch (err) {
@@ -28,9 +79,23 @@ const addFamilyMember = async (req, res) => {
 const getFamilyMembers = async (req, res) => {
     try {
         const patientID = req.params.id;
-        const patient = await Patient.findById(patientID);
+        const patient = await Patient.findById(patientID).populate({
+            path: "family.patient",
+            populate: [
+                { path: "user" },
+                { path: "package" },
+                {
+                    path: "appointments",
+                    populate: { path: "doctor" },
+                },
+                {
+                    path: "prescriptions.associated_appointment",
+                    populate: { path: "doctor" },
+                },
+            ],
+        });
 
-        const familyMembers = patient.family.members;
+        const familyMembers = patient.family;
 
         return res.status(200).json(familyMembers);
     } catch (err) {
@@ -41,16 +106,16 @@ const getFamilyMembers = async (req, res) => {
 const addNewAppointment = async (req, res) => {
     try {
         const appointment = new Appointment({
-            doctor: new Types.ObjectId("652b3fec91562604ff4a2a38"),
-            patient: new Types.ObjectId("652b31c0b3892044a3fe4f6b"),
+            doctor: new Types.ObjectId("654ebbb91eae82683c4bbbfe"),
+            patient: new Types.ObjectId("654e845ec20bc54b4b690f7f"),
             time_slot: {
                 start_time: new Date("2023-10-17T15:17:46.484+00:00"),
                 end_time: new Date("2023-10-17T16:17:46.484+00:00"),
             },
         });
 
-        const doctor = await Doctor.findById("652b3fec91562604ff4a2a38");
-        const patient = await Patient.findById("652b31c0b3892044a3fe4f6b");
+        const doctor = await Doctor.findById("654ebbb91eae82683c4bbbfe");
+        const patient = await Patient.findById("654e845ec20bc54b4b690f7f");
 
         doctor.appointments.push(appointment._id);
         patient.appointments.push(appointment._id);
@@ -66,15 +131,10 @@ const addNewAppointment = async (req, res) => {
 const getPatientAppointments = async (req, res) => {
     try {
         const patientID = req.params.id;
-        const patient = await Patient.findById(patientID)
-            .populate({
-                path: "appointments",
-                populate: { path: "patient" },
-            })
-            .populate({
-                path: "appointments",
-                populate: { path: "doctor" },
-            });
+        const patient = await Patient.findById(patientID).populate({
+            path: "appointments",
+            populate: { path: "doctor", populate: { path: "user" } },
+        });
 
         const appointments = patient.appointments;
 
@@ -125,7 +185,7 @@ const getDoctorsBasedOnPackage = async (req, res) => {
         const patient = await Patient.findById(patientID).populate("package");
 
         const doctors = await Doctor.find({
-            registration_request_status: "accepted",
+            registration_status: "accepted",
         });
 
         const discount = patient.package.doctor_sessions_discount;
@@ -207,4 +267,6 @@ module.exports = {
     getPatientPrescriptions,
     changePatientPackage,
     getDoctorsBasedOnPackage,
+    addMedicalHistoryDocument,
+    getMedicalHistoryDocuments,
 };

@@ -22,6 +22,17 @@ const patientSchema = new Schema(
             mobile_number: { type: String, required: true },
         },
 
+        medical_history_documents: [{ type: String }],
+
+        health_records: [
+            {
+                doctor: { type: Schema.Types.ObjectId, ref: "Doctor" },
+                title: String,
+                description: String,
+                time_stamp: Date,
+            },
+        ],
+
         package: {
             package_info: { type: Schema.Types.ObjectId, ref: "Package" },
             purchase_date: Date,
@@ -61,13 +72,13 @@ const patientSchema = new Schema(
                     enum: ["husband", "wife", "child", "parent", "sibling"],
                     required: true,
                 },
-                linked_account: {
-                    link_type: {
-                        type: String,
-                        enum: ["email", "mobile_number"],
-                    },
-                    link: { type: String },
-                },
+                // linked_account: {
+                //     link_type: {
+                //         type: String,
+                //         enum: ["email", "mobile_number"],
+                //     },
+                //     link: { type: String },
+                // },
             },
         ],
     },

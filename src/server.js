@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 
 const registrationRouter = require("./routes/registrationRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -32,6 +33,7 @@ const app = express();
 // MIDDLEWARE
 app.use(express.json());
 app.use(cors());
+app.use(express.json({ limit: "500mb" }));
 
 // ROUTES
 app.get("/", (req, res) => {
@@ -44,6 +46,6 @@ app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on port ${PORT}...`);
 });

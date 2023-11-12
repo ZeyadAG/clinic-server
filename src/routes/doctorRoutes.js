@@ -10,4 +10,14 @@ router.get("/:id/patients/:patientName", doctorController.getPatientByName);
 
 router.get("/:id/appointments", doctorController.getDoctorAppointments);
 
+router.post(
+    "/:id/addHealthRecord/:patientID",
+    doctorController.addHealthRecordForPatient
+);
+
+router.post(
+    "/:id/acceptEmploymentContract",
+    doctorController.acceptEmploymentContract
+);
+
 module.exports = router;

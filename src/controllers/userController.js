@@ -1,22 +1,23 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 const User = require("../models/User");
 const Patient = require("../models/Patient");
 const Doctor = require("../models/Doctor");
+const Package = require("../models/Package");
 
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
-        // .populate("patient")
-        // .populate("doctor");
-        // populate ba2eit el 7agat hena aw ta7t
+
         if (!user)
             return res.status(400).json({ error: "User does not exist" });
+
         const passwordMatched = await bcrypt.compare(password, user.password);
         if (!passwordMatched) {
-            res.status(400).json({ error: "incorrect password" });
+            return res.status(400).json({ error: "incorrect password" });
         }
 
         const token = jwt.sign(
@@ -56,6 +57,7 @@ const login = async (req, res) => {
                 {
                     path: "family.patient",
                     populate: [
+                        { path: "user" },
                         { path: "package" },
                         {
                             path: "appointments",
@@ -66,6 +68,10 @@ const login = async (req, res) => {
                             populate: { path: "doctor" },
                         },
                     ],
+                },
+                {
+                    path: "health_records.doctor",
+                    populate: { path: "user" },
                 },
             ]);
             response.patient = patient;
@@ -79,9 +85,80 @@ const login = async (req, res) => {
 
 const changeUserPassword = async (req, res) => {
     try {
-    } catch (err) {}
+        const { password } = req.body;
+        const { id } = req.params;
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // user.password = password;
+        user.password = hashedPassword;
+
+        await user.save();
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 };
 
-const generateOTP = async () => {};
+const generateOTP = async (req, res) => {
+    try {
+        const { username } = req.params;
+        const user = await User.findOne({ username });
 
-module.exports = { login, changeUserPassword, generateOTP };
+        const otp = Math.floor(100000 + Math.random() * 900000) + ""; // Generate a random 6-digit OTP
+
+        // Send the OTP to the user's email
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: "seifkandel3@gmail.com", // Your Gmail email address
+                pass: "c x o d r z b m d n u s y f p r", // Your Gmail password or App Password
+            },
+        });
+
+        const mailOptions = {
+            from: "seifkandel3@gmail.com",
+            to: user.email,
+            subject: "Your One Time Password (OTP)",
+            text: `Your OTP is: ${otp}`,
+        };
+
+        transporter.sendMail(mailOptions);
+
+        return res.json({ otp, user_id: user._id });
+    } catch (error) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+const uploadFile = async (req, res) => {
+    try {
+        const { path } = req.body;
+        return res.status(200).download(path);
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+};
+
+const getAllPackages = async (req, res) => {
+    try {
+        const packages = await Package.find();
+        return res.status(200).json(packages);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+};
+
+module.exports = {
+    login,
+    changeUserPassword,
+    generateOTP,
+    uploadFile,
+    getAllPackages,
+};

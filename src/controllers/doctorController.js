@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Doctor = require("../models/Doctor");
+const Patient = require("../models/Patient");
 
 const updateDoctorInfo = async (req, res) => {
     try {
@@ -7,10 +8,11 @@ const updateDoctorInfo = async (req, res) => {
         const doctorID = req.params.id;
 
         const doctor = await Doctor.findById(doctorID);
-        console.log(doctorID);
 
         if (email) {
-            doctor.email = email;
+            const user = await User.findOne({ doctor: doctorID });
+            user.email = email;
+            await user.save();
         }
         if (hourly_rate) {
             doctor.hourly_rate = hourly_rate;
@@ -22,8 +24,8 @@ const updateDoctorInfo = async (req, res) => {
         await doctor.save();
 
         return res.status(200).json(doctor);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 };
 
@@ -32,13 +34,14 @@ const getDoctorPatients = async (req, res) => {
         const doctorID = req.params.id;
         const doctor = await Doctor.findById(doctorID).populate({
             path: "appointments",
-            populate: { path: "patient" },
+            populate: { path: "patient", populate: { path: "user" } },
         });
 
         const patients = doctor.appointments.map((a) => a.patient);
 
         return res.status(200).json(patients);
     } catch (err) {
+        console.log(err);
         return res.status(400).json({ error: err.message });
     }
 };
@@ -66,15 +69,10 @@ const getPatientByName = async (req, res) => {
 const getDoctorAppointments = async (req, res) => {
     try {
         const doctorID = req.params.id;
-        const doctor = await Doctor.findById(doctorID)
-            .populate({
-                path: "appointments",
-                populate: { path: "patient" },
-            })
-            .populate({
-                path: "appointments",
-                populate: { path: "doctor" },
-            });
+        const doctor = await Doctor.findById(doctorID).populate({
+            path: "appointments",
+            populate: { path: "patient", populate: { path: "user" } },
+        });
 
         const appointments = doctor.appointments;
 
@@ -84,9 +82,46 @@ const getDoctorAppointments = async (req, res) => {
     }
 };
 
+const addHealthRecordForPatient = async (req, res) => {
+    try {
+        const { id, patientID } = req.params;
+
+        const patient = await Patient.findById(patientID);
+
+        patient.health_records.push({
+            doctor: id,
+            ...req.body,
+        });
+
+        await patient.save();
+
+        return res.status(200).json(patient.health_records);
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ error: err.message });
+    }
+};
+
+const acceptEmploymentContract = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const doctor = await Doctor.findById(id);
+
+        doctor.registration_status = "accepted";
+
+        await doctor.save();
+        return res.status(200).json(doctor.registration_status);
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ error: err.message });
+    }
+};
+
 module.exports = {
     updateDoctorInfo,
     getDoctorPatients,
     getPatientByName,
     getDoctorAppointments,
+    addHealthRecordForPatient,
+    acceptEmploymentContract,
 };

@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Patient = require("../models/Patient");
 const Doctor = require("../models/Doctor");
 const Package = require("../models/Package");
+const Appointment = require("../models/Appointment");
 
 const addNewAdmin = async (req, res) => {
     try {
@@ -22,31 +23,21 @@ const addNewAdmin = async (req, res) => {
 
 const getDataForAdmin = async (req, res) => {
     try {
-        let results = {
-            admins: [],
-            all_patients: [],
-            accepted_doctors: [],
-            pending_doctors: [],
-        };
+        const [all_patients, accepted_doctors, pending_doctors, admins] =
+            await Promise.all([
+                Patient.find().populate("user"),
+                Doctor.find({ registration_status: "accepted" }).populate(
+                    "user"
+                ),
+                Doctor.find({ registration_status: "pending" }).populate(
+                    "user"
+                ),
+                User.find({ admin: true }),
+            ]);
 
-        results.admins = await User.find({ admin: true });
-
-        results.all_patients = await User.where("patient")
-            .ne(null)
-            .populate("patient");
-
-        results.accepted_doctors = (
-            await User.where("doctor").ne(null).populate("doctor")
-        ).filter(
-            (user) => user.doctor.registration_request_status === "accepted"
-        );
-        results.pending_doctors = (
-            await User.where("doctor").ne(null).populate("doctor")
-        ).filter(
-            (user) => user.doctor.registration_request_status === "pending"
-        );
-
-        return res.status(200).json(results);
+        return res
+            .status(200)
+            .json({ all_patients, accepted_doctors, pending_doctors, admins });
     } catch (err) {
         return res.status(400).json({ error: err.message });
     }
@@ -57,10 +48,10 @@ const acceptDoctor = async (req, res) => {
         const doctorID = req.params.id;
         const doctor = await Doctor.findById(doctorID);
 
-        doctor.registration_request_status = "accepted";
+        doctor.registration_status = "accepted_by_admin";
 
         await doctor.save();
-        return res.status(200).json(doctor);
+        return res.status(200).json(doctor.registration_status);
     } catch (e) {
         res.status(400).json({ error: e.message });
     }
@@ -68,28 +59,25 @@ const acceptDoctor = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const userID = req.params.userID;
+        const { userID } = req.params;
         const user = await User.findById(userID);
 
         if (user.doctor) {
-            await Doctor.deleteOne({ _id: user.doctor });
+            await Promise.all([
+                Doctor.findByIdAndDelete(user.doctor),
+                Appointment.deleteMany({ doctor: user.doctor }),
+            ]);
         }
         if (user.patient) {
-            await Patient.deleteOne({ _id: user.patient });
+            await Promise.all([
+                Patient.findByIdAndDelete(user.patient),
+                Appointment.deleteMany({ patient: user.patient }),
+            ]);
         }
 
         await User.findByIdAndDelete(userID);
 
         return res.status(200).json({ message: "user deleted successfully" });
-    } catch (e) {
-        res.status(400).json({ error: e.message });
-    }
-};
-
-const getAllPackages = async (req, res) => {
-    try {
-        const packages = await Package.find();
-        return res.status(200).json(packages);
     } catch (e) {
         res.status(400).json({ error: e.message });
     }
@@ -129,7 +117,7 @@ const updatePackage = async (req, res) => {
             subscriptions_discount,
         } = req.body;
 
-        const packageID = req.params.id;
+        const { packageID } = req.params;
 
         const pack = await Package.findById(packageID);
 
@@ -159,7 +147,7 @@ const updatePackage = async (req, res) => {
 
 const removePackage = async (req, res) => {
     try {
-        const packageID = req.params.id;
+        const { packageID } = req.params;
         await Package.findByIdAndDelete(packageID);
         return res
             .status(200)
@@ -174,7 +162,6 @@ module.exports = {
     getDataForAdmin,
     deleteUser,
     acceptDoctor,
-    getAllPackages,
     addNewPackage,
     updatePackage,
     removePackage,
