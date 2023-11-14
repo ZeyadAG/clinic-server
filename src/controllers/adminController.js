@@ -4,16 +4,22 @@ const Doctor = require("../models/Doctor");
 const Package = require("../models/Package");
 const Appointment = require("../models/Appointment");
 
+const bcrypt = require("bcrypt");
+
 const addNewAdmin = async (req, res) => {
     try {
         const { username, password, name, email } = req.body;
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const admin = new User({
             username,
-            password,
+            password: hashedPassword,
             name,
             email,
             admin: true,
         });
+
         await admin.save();
         return res.status(201).json(admin);
     } catch (e) {
