@@ -2,7 +2,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 
 const registrationRouter = require("./routes/registrationRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -30,14 +29,18 @@ db.once("open", () => {
 //* APP *//
 const app = express();
 
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server listening on http://localhost:${PORT}...`);
+});
+
 // MIDDLEWARE
 app.use(express.json());
-app.use(cors());
 app.use(express.json({ limit: "500mb" }));
+app.use(cors());
 
 // ROUTES
 app.get("/", (req, res) => {
-    res.status(200).send("Welcome!");
+    res.status(200).send("Welcome to Olayan");
 });
 
 app.use("/register", registrationRouter);
@@ -45,7 +48,3 @@ app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
-
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server listening on port ${PORT}...`);
-});

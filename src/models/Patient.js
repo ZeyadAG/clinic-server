@@ -3,10 +3,6 @@ const Schema = mongoose.Schema;
 
 const patientSchema = new Schema(
     {
-        // name: { type: String, required: true },
-
-        // email: { type: String, required: true, lowercase: true },
-
         user: { type: Schema.Types.ObjectId, ref: "User" },
 
         date_of_birth: { type: Date, required: true },
@@ -39,7 +35,7 @@ const patientSchema = new Schema(
             expiry_date: Date,
             status: {
                 type: String,
-                enum: ["subscribed", "unsubscribed", "expired"],
+                enum: ["subscribed", "unsubscribed"],
                 required: true,
                 default: "unsubscribed",
             },
@@ -72,13 +68,6 @@ const patientSchema = new Schema(
                     enum: ["husband", "wife", "child", "parent", "sibling"],
                     required: true,
                 },
-                // linked_account: {
-                //     link_type: {
-                //         type: String,
-                //         enum: ["email", "mobile_number"],
-                //     },
-                //     link: { type: String },
-                // },
             },
         ],
     },

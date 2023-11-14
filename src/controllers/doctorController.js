@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Doctor = require("../models/Doctor");
 const Patient = require("../models/Patient");
+const Appointment = require("../models/Appointment");
 
 const updateDoctorInfo = async (req, res) => {
     try {
@@ -117,6 +118,21 @@ const acceptEmploymentContract = async (req, res) => {
     }
 };
 
+const addTimeslot = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const doctor = await Doctor.findById(id);
+
+        doctor.appointments_time_slots.push({ ...req.body });
+
+        await doctor.save();
+        return res.status(200).json(doctor.appointments_time_slots);
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ error: err.message });
+    }
+};
+
 module.exports = {
     updateDoctorInfo,
     getDoctorPatients,
@@ -124,4 +140,5 @@ module.exports = {
     getDoctorAppointments,
     addHealthRecordForPatient,
     acceptEmploymentContract,
+    addTimeslot,
 };

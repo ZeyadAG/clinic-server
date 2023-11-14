@@ -10,8 +10,8 @@ const addNewAdmin = async (req, res) => {
         const admin = new User({
             username,
             password,
-            name, // +
-            email, // +
+            name,
+            email,
             admin: true,
         });
         await admin.save();

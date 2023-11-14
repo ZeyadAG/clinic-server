@@ -13,17 +13,15 @@ const registerNewPatient = async (req, res) => {
             date_of_birth,
             gender,
             mobile_number,
-            national_id, // +
+            national_id,
             emergency_contact,
         } = req.body;
 
         const patient = new Patient({
-            // name, // -
-            // email, // -
             date_of_birth,
             gender,
             mobile_number,
-            national_id, // +
+            national_id,
             emergency_contact,
         });
 
@@ -32,9 +30,8 @@ const registerNewPatient = async (req, res) => {
         const user = new User({
             username,
             password: hashedPassword,
-            // password,
-            name, // +
-            email, // +
+            name,
+            email,
             patient: patient._id,
         });
 
@@ -56,7 +53,7 @@ const registerNewDoctor = async (req, res) => {
             password,
             name,
             email,
-            speciality, // +
+            speciality,
             date_of_birth,
             hourly_rate,
             affiliated_hospital,
@@ -64,9 +61,7 @@ const registerNewDoctor = async (req, res) => {
         } = req.body;
 
         const doctor = new Doctor({
-            // name,
-            // email,
-            speciality, // +
+            speciality,
             date_of_birth,
             hourly_rate,
             affiliated_hospital,
@@ -78,7 +73,6 @@ const registerNewDoctor = async (req, res) => {
         const user = new User({
             username,
             password: hashedPassword,
-            // password,
             name,
             email,
             doctor: doctor._id,
@@ -138,7 +132,6 @@ const registerNewDoctor = async (req, res) => {
         await doctor.save();
         return res.status(201).json(doctor);
     } catch (err) {
-        console.log(err);
         res.status(400).json({ error: err.message });
     }
 };

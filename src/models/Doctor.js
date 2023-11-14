@@ -11,10 +11,6 @@ const doctorSchema = new Schema(
             default: "pending",
         },
 
-        // name: { type: String, required: true },
-
-        // email: { type: String, required: true, lowercase: true },
-
         national_id_document: String,
         medical_degree_document: String,
         medical_licenses: [String],
@@ -46,6 +42,7 @@ const doctorSchema = new Schema(
                     enum: ["reserved", "available"],
                     default: "available",
                 },
+                price: { type: Number },
             },
         ],
 

@@ -45,7 +45,7 @@ const login = async (req, res) => {
 
             const patient = await Patient.findById(user.patient);
             await patient.populate([
-                { path: "package" },
+                { path: "package.package_info" },
                 {
                     path: "appointments",
                     populate: { path: "doctor" },
@@ -95,7 +95,6 @@ const changeUserPassword = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // user.password = password;
         user.password = hashedPassword;
 
         await user.save();
@@ -111,21 +110,21 @@ const generateOTP = async (req, res) => {
         const { username } = req.params;
         const user = await User.findOne({ username });
 
-        const otp = Math.floor(100000 + Math.random() * 900000) + ""; // Generate a random 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000) + "";
 
         // Send the OTP to the user's email
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "seifkandel3@gmail.com", // Your Gmail email address
-                pass: "c x o d r z b m d n u s y f p r", // Your Gmail password or App Password
+                user: "seifkandel3@gmail.com",
+                pass: "c x o d r z b m d n u s y f p r",
             },
         });
 
         const mailOptions = {
             from: "seifkandel3@gmail.com",
             to: user.email,
-            subject: "Your One Time Password (OTP)",
+            subject: "Olayan Password Reset OTP",
             text: `Your OTP is: ${otp}`,
         };
 
