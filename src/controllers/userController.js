@@ -6,11 +6,23 @@ const User = require("../models/User");
 const Patient = require("../models/Patient");
 const Doctor = require("../models/Doctor");
 const Package = require("../models/Package");
+const Chat = require("../models/Chat");
 
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ username }).populate([
+            {
+                path: "notifications.appointment",
+                populate: [
+                    { path: "patient", populate: { path: "user" } },
+                    { path: "doctor", populate: { path: "user" } },
+                ],
+            },
+            {
+                path: "notifications.medicine",
+            },
+        ]);
 
         if (!user)
             return res.status(400).json({ error: "User does not exist" });
@@ -51,8 +63,7 @@ const login = async (req, res) => {
                     populate: { path: "doctor" },
                 },
                 {
-                    path: "prescriptions.associated_appointment",
-                    populate: { path: "doctor" },
+                    path: "prescriptions.associated_doctor",
                 },
                 {
                     path: "family.patient",
@@ -64,8 +75,7 @@ const login = async (req, res) => {
                             populate: { path: "doctor" },
                         },
                         {
-                            path: "prescriptions.associated_appointment",
-                            populate: { path: "doctor" },
+                            path: "prescriptions.associated_doctor",
                         },
                     ],
                 },
@@ -154,10 +164,79 @@ const getAllPackages = async (req, res) => {
     }
 };
 
+const getUserNotifications = async (req, res) => {
+    try {
+        const { userID } = req.params;
+        const user = await User.findById(userID).populate([
+            {
+                path: "notifications.appointment",
+                populate: [
+                    { path: "patient", populate: { path: "user" } },
+                    { path: "doctor", populate: { path: "user" } },
+                ],
+            },
+            {
+                path: "notifications.medicine",
+            },
+        ]);
+        return res.status(200).json(user.notifications);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+};
+
+const getUsersChat = async (req, res) => {
+    try {
+        const { firstUserID, secondUserID } = req.params;
+        const chat = await Chat.findOne({
+            $and: [{ first_user: firstUserID }, { second_user: secondUserID }],
+        });
+        // console.log(
+        //     "🚀 ~ file: userController.js:194 ~ getUsersChat ~ chat:",
+        //     chat,
+        //     firstUserID,
+        //     secondUserID
+        // );
+
+        return res.status(200).json(chat);
+    } catch (e) {
+        // console.log(e);
+        return res.status(400).json({ error: e.message });
+    }
+};
+
+const sendChatMessage = async (req, res) => {
+    try {
+        const { firstUserID, secondUserID } = req.params;
+        const { message, senderID } = req.body;
+
+        const chat = await Chat.findOne({
+            $and: [{ first_user: firstUserID }, { second_user: secondUserID }],
+        });
+
+        const newMessage = {
+            message,
+            sent_at: new Date(),
+            sender: senderID,
+        };
+
+        chat.messages.push(newMessage);
+
+        await chat.save();
+
+        return res.status(200).json(chat);
+    } catch (e) {
+        res.status(400).json({ error: e.message });
+    }
+};
+
 module.exports = {
     login,
     changeUserPassword,
     generateOTP,
     uploadFile,
     getAllPackages,
+    getUserNotifications,
+    getUsersChat,
+    sendChatMessage,
 };

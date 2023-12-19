@@ -8,6 +8,8 @@ const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
 const patientRouter = require("./routes/patientRoutes");
 const doctorRouter = require("./routes/doctorRoutes");
+const appointmentRouter = require("./routes/appointmentRoutes");
+const prescriptionRouter = require("./routes/prescriptionRoutes");
 
 //* SETUP *//
 require("dotenv").config();
@@ -48,3 +50,5 @@ app.use("/user", userRouter);
 app.use("/admin", adminRouter);
 app.use("/doctor", doctorRouter);
 app.use("/patient", patientRouter);
+app.use("/appointment", appointmentRouter);
+app.use("/prescription", prescriptionRouter);

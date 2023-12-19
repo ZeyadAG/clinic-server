@@ -10,9 +10,31 @@ const userSchema = new Schema(
         name: { type: String, required: true },
         email: { type: String, required: true, lowercase: true },
 
+        admin: { type: Boolean },
         doctor: { type: Schema.Types.ObjectId, ref: "Doctor" },
         patient: { type: Schema.Types.ObjectId, ref: "Patient" },
-        admin: { type: Boolean },
+        pharmacist: { type: Schema.Types.ObjectId, ref: "Pharmacist" },
+
+        notifications: [
+            {
+                type: {
+                    type: String,
+                    enum: [
+                        "new appointment",
+                        "cancelled appointment",
+                        "rescheduled appointment",
+                        "medicine out of stock",
+                    ],
+                },
+                description: String,
+                time_of_notification: Date,
+                appointment: {
+                    type: Schema.Types.ObjectId,
+                    ref: "Appointment",
+                },
+                medicine: { type: Schema.Types.ObjectId, ref: "Medicine" },
+            },
+        ],
     },
     { timestamps: true }
 );

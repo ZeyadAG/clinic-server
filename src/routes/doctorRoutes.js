@@ -9,8 +9,6 @@ router.get("/:id/patients", doctorController.getDoctorPatients);
 
 router.get("/:id/patients/:patientName", doctorController.getPatientByName);
 
-router.get("/:id/appointments", doctorController.getDoctorAppointments);
-
 router.post(
     "/:id/addHealthRecord/:patientID",
     doctorController.addHealthRecordForPatient
@@ -22,5 +20,7 @@ router.post(
 );
 
 router.post("/:id/addTimeslot", doctorController.addTimeslot);
+
+router.post("/:id/handleWalletPayment", doctorController.handleWalletPayment);
 
 module.exports = router;

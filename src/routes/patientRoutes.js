@@ -28,15 +28,6 @@ router.post(
     patientController.handlePackageCardPayment
 );
 
-router.post(
-    "/handleAppointmentCardPayment",
-    patientController.handleAppointmentCardPayment
-);
-
-router.post("/:id/newAppointment", patientController.addNewAppointment);
-
-router.get("/:id/appointments", patientController.getPatientAppointments);
-
 router.get("/:id/doctors", patientController.getPatientDoctors);
 
 router.get(
@@ -44,14 +35,15 @@ router.get(
     patientController.getDoctorsBasedOnPackage
 );
 
-router.get("/newPrescription", patientController.addNewPrescription);
-
-router.get("/:id/prescriptions", patientController.getPatientPrescriptions);
-
 router.post(
     "/:id/uploadMedicalHistoryDocument",
     fileUpload(),
     patientController.addMedicalHistoryDocument
+);
+
+router.post(
+    "/:id/removeMedicalHistoryDocument",
+    patientController.removeMedicalHistoryDocument
 );
 
 router.get(

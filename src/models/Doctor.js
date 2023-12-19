@@ -11,19 +11,15 @@ const doctorSchema = new Schema(
             default: "pending",
         },
 
+        date_of_birth: { type: Date, required: true },
+        affiliated_hospital: { type: String, required: true },
+        educational_background: { type: String, required: true },
+        speciality: { type: String, required: true },
+        hourly_rate: { type: Number, required: true },
+
         national_id_document: String,
         medical_degree_document: String,
         medical_licenses: [String],
-
-        date_of_birth: { type: Date, required: true },
-
-        affiliated_hospital: { type: String, required: true },
-
-        educational_background: { type: String, required: true },
-
-        speciality: { type: String, required: true },
-
-        hourly_rate: { type: Number, required: true },
 
         wallet_amount: { type: Number, default: 0 },
 
@@ -47,6 +43,10 @@ const doctorSchema = new Schema(
         ],
 
         appointments: [{ type: Schema.Types.ObjectId, ref: "Appointment" }],
+
+        follow_up_requests: [
+            { type: Schema.Types.ObjectId, ref: "Appointment" },
+        ],
     },
     { timestamps: true }
 );

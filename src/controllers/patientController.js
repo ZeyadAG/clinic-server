@@ -38,6 +38,26 @@ const addMedicalHistoryDocument = async (req, res) => {
     }
 };
 
+const removeMedicalHistoryDocument = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const filePath = req.body.path;
+
+        const patient = await Patient.findById(id);
+
+        patient.medical_history_documents =
+            patient.medical_history_documents.filter(
+                (path) => path !== filePath
+            );
+
+        patient.save();
+
+        return res.status(200).json(patient.medical_history_documents);
+    } catch (err) {
+        return res.status(400).json({ error: err.message });
+    }
+};
+
 const getMedicalHistoryDocuments = async (req, res) => {
     try {
         const { id } = req.params;
@@ -91,8 +111,7 @@ const getFamilyMembers = async (req, res) => {
                     populate: { path: "doctor", populate: "user" },
                 },
                 {
-                    path: "prescriptions.associated_appointment",
-                    populate: { path: "doctor" },
+                    path: "prescriptions.associated_doctor",
                 },
             ],
         });
@@ -151,107 +170,24 @@ const handlePackageCardPayment = async (req, res) => {
     }
 };
 
-const handleAppointmentCardPayment = async (req, res) => {
-    try {
-        const { payment_name, payment_amount } = req.body;
-        const { patient_id, doctor_id, timeslot_id } = req.body;
-
-        //Stripe
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ["card"],
-            mode: "payment",
-            line_items: [
-                {
-                    price_data: {
-                        currency: "egp",
-                        product_data: {
-                            name: payment_name,
-                        },
-                        unit_amount: payment_amount * 100,
-                    },
-                    quantity: 1,
-                },
-            ],
-            success_url: `http://localhost:5173/appointmentSuccessPayment/${patient_id}/${doctor_id}/${timeslot_id}`,
-            cancel_url: `http://localhost:5173/cancel`,
-        });
-        res.json({ url: session.url });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-};
-
-const addNewAppointment = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const doctorID = req.body.doctor_id;
-        const timeslotID = req.body.time_slot;
-
-        const [patient, doctor] = await Promise.all([
-            Patient.findById(id),
-            Doctor.findById(doctorID),
-        ]);
-
-        const timeslotIndex = doctor.appointments_time_slots.findIndex(
-            (slot) => slot._id == timeslotID
-        );
-
-        const timeslot = doctor.appointments_time_slots[timeslotIndex];
-
-        if (timeslot.status === "reserved") {
-            doctor.appointments_time_slots[timeslotIndex].status = "reserved";
-            return res.status(200).json({ message: "already reserved" });
-        }
-
-        doctor.appointments_time_slots[timeslotIndex].status = "reserved";
-
-        const appointment = new Appointment({
-            doctor: doctorID,
-            patient: id,
-            time_slot: {
-                start_time: timeslot.start_time,
-                end_time: timeslot.end_time,
-            },
-        });
-
-        await appointment.save();
-
-        doctor.appointments.push(appointment._id);
-        patient.appointments.push(appointment._id);
-
-        await Promise.all([patient.save(), doctor.save()]);
-
-        return res.status(200).json({ appointment });
-    } catch (err) {
-        return res.status(400).json({ error: err.message });
-    }
-};
-
-const getPatientAppointments = async (req, res) => {
-    try {
-        const patientID = req.params.id;
-        const patient = await Patient.findById(patientID).populate({
-            path: "appointments",
-            populate: { path: "doctor", populate: { path: "user" } },
-        });
-
-        const appointments = patient.appointments;
-
-        return res.status(200).json(appointments);
-    } catch (err) {
-        return res.status(400).json({ error: err.message });
-    }
-};
-
 const getPatientDoctors = async (req, res) => {
     try {
         const patientID = req.params.id;
         const patient = await Patient.findById(patientID).populate({
             path: "appointments",
-            populate: { path: "doctor" },
+            populate: { path: "doctor", populate: "user" },
         });
 
-        const doctors = patient.appointments.map((a) => a.doctor);
+        let doctors = patient.appointments.map((a) => a.doctor);
+
+        doctors = doctors.filter((item, index, self) => {
+            return (
+                index ===
+                self.findIndex(
+                    (t) => JSON.stringify(t) === JSON.stringify(item)
+                )
+            );
+        });
 
         return res.status(200).json(doctors);
     } catch (err) {
@@ -333,67 +269,16 @@ const getDoctorsBasedOnPackage = async (req, res) => {
     }
 };
 
-const addNewPrescription = async (req, res) => {
-    try {
-        const patient = await Patient.findById("654fcc79fe70c5c236e1ef50");
-        const prescription = {
-            medicines: [
-                {
-                    name: "milga",
-                    dosage: "300mg",
-                },
-                {
-                    name: "congestal",
-                    dosage: "1000mg",
-                },
-            ],
-            associated_appointment: new Types.ObjectId(
-                "6551532ae658e1ef7be41886"
-            ),
-            time_of_prescription: new Date("2023-10-15T18:17:46.484+00:00"),
-            status: "unfilled",
-        };
-
-        patient.prescriptions.push(prescription);
-
-        await patient.save();
-
-        return res.status(200).json(patient.prescriptions);
-    } catch (err) {
-        return res.status(400).json({ error: err.message });
-    }
-};
-
-const getPatientPrescriptions = async (req, res) => {
-    try {
-        const patientID = req.params.id;
-        const patient = await Patient.findById(patientID).populate({
-            path: "prescriptions.associated_appointment",
-            populate: { path: "doctor", populate: "user" },
-        });
-
-        const prescriptions = patient.prescriptions;
-
-        return res.status(200).json(prescriptions);
-    } catch (err) {
-        return res.status(400).json({ error: err.message });
-    }
-};
-
 module.exports = {
     addFamilyMember,
     getFamilyMembers,
     handleWalletPayment,
-    handleAppointmentCardPayment,
     handlePackageCardPayment,
-    addNewAppointment,
-    getPatientAppointments,
     getPatientDoctors,
-    addNewPrescription,
-    getPatientPrescriptions,
     changePatientPackage,
     cancelPackageSubscription,
     getDoctorsBasedOnPackage,
     addMedicalHistoryDocument,
     getMedicalHistoryDocuments,
+    removeMedicalHistoryDocument,
 };

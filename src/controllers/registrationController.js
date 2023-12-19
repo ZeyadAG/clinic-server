@@ -20,6 +20,7 @@ const registerNewPatient = async (req, res) => {
         const patient = new Patient({
             date_of_birth,
             gender,
+            email,
             mobile_number,
             national_id,
             emergency_contact,

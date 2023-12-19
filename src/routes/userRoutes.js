@@ -13,4 +13,13 @@ router.post("/files", userController.uploadFile);
 
 router.get("/packages", userController.getAllPackages);
 
+router.get("/:userID/notifications", userController.getUserNotifications);
+
+router.get("/chat/:firstUserID/:secondUserID", userController.getUsersChat);
+
+router.post(
+    "/chat/newMessage/:firstUserID/:secondUserID",
+    userController.sendChatMessage
+);
+
 module.exports = router;

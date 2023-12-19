@@ -31,6 +31,11 @@ const appointmentSchema = new Schema(
             enum: ["upcoming", "completed", "cancelled", "rescheduled"],
             default: "upcoming",
         },
+
+        follow_up: {
+            type: String,
+            enum: ["accepted", "rejected", "pending"],
+        },
     },
     { timestamps: true }
 );
