@@ -286,12 +286,36 @@ const handleFollowUp = async (req, res) => {
 const rescheduleAppointment = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(
+            "🚀 ~ file: appointmentController.js:289 ~ rescheduleAppointment ~ id:",
+            id
+        );
 
         const doctorID = req.body.doctor_id;
+        console.log(
+            "🚀 ~ file: appointmentController.js:291 ~ rescheduleAppointment ~ doctorID:",
+            doctorID
+        );
         const patientID = req.body.patient_id;
+        console.log(
+            "🚀 ~ file: appointmentController.js:293 ~ rescheduleAppointment ~ patientID:",
+            patientID
+        );
         const timeslotID = req.body.time_slot;
+        console.log(
+            "🚀 ~ file: appointmentController.js:295 ~ rescheduleAppointment ~ timeslotID:",
+            timeslotID
+        );
         const oldStartTime = req.body.old_start_time;
+        console.log(
+            "🚀 ~ file: appointmentController.js:297 ~ rescheduleAppointment ~ oldStartTime:",
+            oldStartTime
+        );
         const oldEndTime = req.body.old_end_time;
+        console.log(
+            "🚀 ~ file: appointmentController.js:299 ~ rescheduleAppointment ~ oldEndTime:",
+            oldEndTime
+        );
 
         const [appointment, doctor, patient] = await Promise.all([
             Appointment.findById(id),
@@ -310,12 +334,28 @@ const rescheduleAppointment = async (req, res) => {
 
         const oldTimeslotIndex = doctor.appointments_time_slots.findIndex(
             (slot) =>
-                slot.start_time.toLocaleString() == oldStartTime &&
-                slot.end_time.toLocaleString() == oldEndTime
+                new Date(slot.start_time).toISOString() ==
+                    new Date(oldStartTime).toISOString() &&
+                new Date(slot.end_time).toISOString() ==
+                    new Date(oldEndTime).toISOString()
+        );
+
+        console.log(
+            "🚀 ~ file: appointmentController.js:340 ~ rescheduleAppointment ~ oldTimeslotIndex:",
+            oldTimeslotIndex
         );
 
         doctor.appointments_time_slots[timeslotIndex].status = "reserved";
+        console.log(
+            "🚀 ~ file: appointmentController.js:323 ~ rescheduleAppointment ~ doctor.appointments_time_slots[timeslotIndex]:",
+            doctor.appointments_time_slots[timeslotIndex]
+        );
+
         doctor.appointments_time_slots[oldTimeslotIndex].status = "available";
+        console.log(
+            "🚀 ~ file: appointmentController.js:325 ~ rescheduleAppointment ~ doctor.appointments_time_slots[oldTimeslotIndex]:",
+            doctor.appointments_time_slots[oldTimeslotIndex]
+        );
 
         appointment.status = "rescheduled";
 
@@ -399,8 +439,10 @@ const cancelAppointment = async (req, res) => {
 
         const timeslotIndex = doctor.appointments_time_slots.findIndex(
             (slot) =>
-                slot.start_time.toLocaleString() == oldStartTime &&
-                slot.end_time.toLocaleString() == oldEndTime
+                new Date(slot.start_time).toISOString() ==
+                    new Date(oldStartTime).toISOString() &&
+                new Date(slot.end_time).toISOString() ==
+                    new Date(oldEndTime).toISOString()
         );
 
         doctor.appointments_time_slots[timeslotIndex].status = "available";

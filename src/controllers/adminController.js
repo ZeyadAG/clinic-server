@@ -52,13 +52,22 @@ const getDataForAdmin = async (req, res) => {
 const acceptDoctor = async (req, res) => {
     try {
         const doctorID = req.params.id;
+        console.log(
+            "🚀 ~ file: adminController.js:55 ~ acceptDoctor ~ doctorID:",
+            doctorID
+        );
         const doctor = await Doctor.findById(doctorID);
+        console.log(
+            "🚀 ~ file: adminController.js:57 ~ acceptDoctor ~ doctor:",
+            doctor
+        );
 
         doctor.registration_status = "accepted_by_admin";
 
         await doctor.save();
         return res.status(200).json(doctor.registration_status);
     } catch (e) {
+        console.log(e);
         res.status(400).json({ error: e.message });
     }
 };

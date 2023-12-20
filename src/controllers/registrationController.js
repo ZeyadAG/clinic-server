@@ -21,6 +21,7 @@ const registerNewPatient = async (req, res) => {
             date_of_birth,
             gender,
             email,
+            name,
             mobile_number,
             national_id,
             emergency_contact,
@@ -131,8 +132,9 @@ const registerNewDoctor = async (req, res) => {
 
         await user.save();
         await doctor.save();
-        return res.status(201).json(doctor);
+        return res.status(200).json(doctor);
     } catch (err) {
+        console.log(err);
         res.status(400).json({ error: err.message });
     }
 };

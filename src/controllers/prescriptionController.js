@@ -88,8 +88,57 @@ const editPrescription = async (req, res) => {
             (prescription) => prescription._id == prescriptionID
         );
 
-        patient.prescriptions[prescriptionIndex].medicines = medicines;
+        // const prescriptionMedicineIDs = patient.prescriptions[
+        //     prescriptionIndex
+        // ].medicines.map((med) => med.medicine);
 
+        // const updatedMedicineIDs = medicines.map((med) => med.medicine);
+
+        // function getDifference(arr1, arr2) {
+        //     const combinedArray = arr1.concat(arr2);
+        //     const differenceArray = combinedArray.filter((item, index) => {
+        //         return combinedArray.indexOf(item) === index;
+        //     });
+
+        //     return differenceArray;
+        // }
+
+        // const medicineIDsToAddToCart = get updatedMedicineIDs;
+
+        // const medicineIDsToRemoveFromCart
+
+        // patient.cart.forEach((cartItem) => {
+        //     cartItem.prescription_ids.forEach((presID) => {
+        //         if (presID.toString() == prescriptionID) {
+        //             // law medicine mawgood fel prescription w mesh mawgood fel updated sheelo mel cart
+        //             if (
+        //                 !updatedMedicineIDs.find(
+        //                     (id) => id.toString() == cartItem.medicineId
+        //                 ) &&
+        //                 prescriptionMedicineIDs.find(
+        //                     (id) => id.toString() == cartItem.medicineId
+        //                 )
+        //             ) {
+        //                 // sheelo mel cart
+        //             }
+        //             // law medicine mawgood fel updated we mesh mawgood fel pres 7oto fel cart
+        //             if (
+        //                 updatedMedicineIDs.find(
+        //                     (id) => id.toString() == cartItem.medicineId
+        //                 ) &&
+        //                 !prescriptionMedicineIDs.find(
+        //                     (id) => id.toString() == cartItem.medicineId
+        //                 )
+        //             ) {
+        //                 // 7oto  fel cart
+        //                 const newCartItem = {};
+        //                 patient.cart.push();
+        //             }
+        //         }
+        //     });
+        // });
+
+        patient.prescriptions[prescriptionIndex].medicines = medicines;
         await patient.save();
 
         return res.status(200).json(patient.prescriptions);
@@ -147,24 +196,25 @@ const buyPrescriptionFromPharmacy = async (req, res) => {
                 }
                 cartItem.prescription_ids.push(prescriptionID);
             } else {
-                const newCartItem = {
-                    medicineId: med._id,
-                    name: med.name,
-                    price: med.price,
-                    quantity: 1,
-                    prescription_ids: [prescriptionID],
-                };
-                console.log(
-                    "🚀 ~ file: prescriptionController.js:141 ~ medicines.forEach ~ newCartItem:",
-                    newCartItem
-                );
+                if (med.quantity > 0) {
+                    const newCartItem = {
+                        medicineId: med._id,
+                        name: med.name,
+                        price: med.price,
+                        quantity: 1,
+                        prescription_ids: [prescriptionID],
+                    };
+                    console.log(
+                        "🚀 ~ file: prescriptionController.js:141 ~ medicines.forEach ~ newCartItem:",
+                        newCartItem
+                    );
 
-                // patient.cart = [...patient.cart, newCartItem];
-                patient.cart.push(newCartItem);
-                console.log(
-                    "🚀 ~ file: prescriptionController.js:144 ~ medicines.forEach ~ cart:",
-                    patient.cart
-                );
+                    patient.cart.push(newCartItem);
+                    console.log(
+                        "🚀 ~ file: prescriptionController.js:144 ~ medicines.forEach ~ cart:",
+                        patient.cart
+                    );
+                }
             }
         });
 
